@@ -4,20 +4,18 @@ import ResponsivePagination from "react-responsive-pagination";
 import "react-responsive-pagination/themes/classic.css";
 
 export default function Products() {
-  const [productItem, setProductItem] = useState([]);
-  const [categoryItem, setCategoryItem] = useState([]);
-  const [dropdown, setDropdown] = useState(false);
-  const [sorting, setSorting] = useState(null);
-  const [brandItem, setBrandItem] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [categorieFillter, setCategorieFilter] = useState([]);
-  const [brandFillter, setBrandFilter] = useState([]);
-  const [totalPage, setTotalPage] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [showSidebar, setShowSidebar] = useState(false); // 👉 NEW STATE
+  let [productItem, setProductItem] = useState([]);
+  let [categoryItem, setCategoryItem] = useState([]);
+  let [dropdown, setDropdown] = useState(false);
+  let [sorting, setSorting] = useState(null);
+  let [brandItem, setBrandItem] = useState([]);
+  let [isLoading, setIsLoading] = useState(false);
+  let [categorieFillter, setCategorieFilter] = useState([]);
+  let [brandFillter, setBrandFilter] = useState([]);
+  let [totalPage, setTotalPage] = useState(0);
+  let [currentPage, setCurrentPage] = useState(1);
 
-
-  const getProduct = () => {
+  let getProduct = () => {
     setIsLoading(true);
     axios
       .get("https://wscubetech.co/ecommerce-api/products.php", {
@@ -26,7 +24,12 @@ export default function Products() {
           limit: 12,
           categories: categorieFillter.join(","),
           brands: brandFillter.join(","),
-          sorting,
+          price_from: "",
+          price_to: "",
+          discount_from: "",
+          discount_to: "",
+          rating: null,
+          sorting: sorting,
         },
       })
       .then((res) => res.data)
@@ -37,7 +40,7 @@ export default function Products() {
       });
   };
 
-  const getCategory = () => {
+  let getCategory = () => {
     axios
       .get("https://wscubetech.co/ecommerce-api/categories.php")
       .then((res) => res.data)
@@ -46,7 +49,7 @@ export default function Products() {
       });
   };
 
-  const getBrand = () => {
+  let getBrand = () => {
     axios
       .get("https://wscubetech.co/ecommerce-api/brands.php")
       .then((res) => res.data)
@@ -55,21 +58,27 @@ export default function Products() {
       });
   };
 
-  const getMyCetagory = (e) => {
-    const { value, checked } = e.target;
+  let getMyCetagory = (e) => {
+    let { value, checked } = e.target;
     if (checked) {
-      setCategorieFilter([...categorieFillter, value]);
+      if (!categorieFillter.includes(value)) {
+        setCategorieFilter([...categorieFillter, value]);
+      }
     } else {
-      setCategorieFilter(categorieFillter.filter((v) => v !== value));
+      let finalData = categorieFillter.filter((v) => v !== value);
+      setCategorieFilter(finalData);
     }
   };
 
-  const getMyBrand = (e) => {
-    const { value, checked } = e.target;
+  let getMyBrand = (e) => {
+    let { value, checked } = e.target;
     if (checked) {
-      setBrandFilter([...brandFillter, value]);
+      if (!brandFillter.includes(value)) {
+        setBrandFilter([...brandFillter, value]);
+      }
     } else {
-      setBrandFilter(brandFillter.filter((v) => v !== value));
+      let finalData = brandFillter.filter((v) => v !== value);
+      setBrandFilter(finalData);
     }
   };
 
@@ -77,172 +86,265 @@ export default function Products() {
     getCategory();
     getBrand();
   }, []);
-
   useEffect(() => {
     getProduct();
   }, [sorting, categorieFillter, brandFillter, currentPage]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6 p-4 sm:p-6 bg-gray-50 min-h-screen relative">
-      
-      {/* 👉 Mobile Toggle Button */}
-      <button
-        onClick={() => setShowSidebar(!showSidebar)}
-        className="md:hidden bg-blue-600 text-white px-4 py-2 rounded-lg mb-4 w-max"
-      >
-        {showSidebar ? "Hide Filters" : "Show Filters"}
-      </button>
+    <div className="grid grid-cols-[20%_80%] gap-6 p-6 bg-gray-50 min-h-screen">
+      {/* Sidebar */}
+      <div className="bg-white p-5 rounded-xl shadow-md">
+        {/* Category List 1 */}
+        <div className="mb-6">
+          <h2 className="text-md font-semibold text-gray-700 mb-3">
+            Categories
+          </h2>
+          <ul className="space-y-2 max-h-[180px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+            {categoryItem.map((item, index) => (
+              <li
+                key={index}
+                className="flex items-center gap-2 text-sm text-gray-700"
+              >
+                <input
+                  type="checkbox"
+                  value={item.slug}
+                  onChange={getMyCetagory}
+                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                />
+                <label className="cursor-pointer hover:text-purple-700">
+                  {item.name}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      {/* 👉 Sidebar */}
-      {(showSidebar || window.innerWidth >= 768) && (
-        <aside
-          className={`${
-            showSidebar ? "absolute z-30 top-20 left-4 right-4 bg-white" : "hidden md:block"
-          } md:relative p-5 rounded-xl shadow-md md:shadow-none`}
-        >
-          <div className="mb-6">
-            <h2 className="text-md font-semibold text-gray-700 mb-3">Categories</h2>
-            <ul className="space-y-2 max-h-[180px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-              {categoryItem.map((item, index) => (
-                <li key={index} className="flex items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    value={item.slug}
-                    onChange={getMyCetagory}
-                    className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                  />
-                  <label className="cursor-pointer hover:text-purple-700">
-                    {item.name}
-                  </label>
-                </li>
-              ))}
-            </ul>
+        {/* Category List 2 */}
+        <div>
+          <h2 className="text-md font-semibold text-gray-700 mb-3">Brands</h2>
+          <ul className="space-y-2 max-h-[180px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+            {brandItem.map((item, index) => (
+              <li
+                key={index}
+                className="flex items-center gap-2 text-sm text-gray-700"
+              >
+                <input
+                  type="checkbox"
+                  value={item.slug}
+                  onChange={getMyBrand}
+                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                />
+                <label className="cursor-pointer hover:text-purple-700">
+                  {item.name}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2 className="text-md font-semibold text-gray-700 my-5">Price</h2>
+          <ul className="space-y-2 max-h-[180px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+            <li className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" />RS.10 to 50</li>
+              
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div className="flex justify-between mb-5">
+          <div>
+            <h1 className="font-bold text-2xl">Products</h1>
           </div>
-
-          <div className="mb-6">
-            <h2 className="text-md font-semibold text-gray-700 mb-3">Brands</h2>
-            <ul className="space-y-2 max-h-[180px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-              {brandItem.map((item, index) => (
-                <li key={index} className="flex items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    value={item.slug}
-                    onChange={getMyBrand}
-                    className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                  />
-                  <label className="cursor-pointer hover:text-purple-700">
-                    {item.name}
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
-      )}
-
-      {/* Main Content */}
-      <main>
-        {/* Header with sorting */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
-          <h1 className="font-bold text-2xl">Products</h1>
-          <div className="relative">
+          <div>
             <button
+              id="dropdownDefaultButton"
+              data-dropdown-toggle="dropdown"
               onClick={() => setDropdown(!dropdown)}
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center"
+              class="cursor-pointer text-white relative bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              type="button"
             >
-              Recommendation
+              Recommendation{" "}
               <svg
-                className="w-2.5 h-2.5 ms-2"
+                class="w-2.5 h-2.5 ms-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 10 6"
-                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M1 1l4 4 4-4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 1 4 4 4-4 z-10"
                 />
               </svg>
             </button>
-            {dropdown && (
-              <div className="absolute right-0 z-20 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                <ul className="py-1 text-sm text-gray-700">
-                  {[
-                    ["Name: A to Z", 1],
-                    ["Name: Z to A", 2],
-                    ["Price: Low to High", 3],
-                    ["Price: High to Low", 4],
-                    ["Discount: Low to High", 5],
-                    ["Discount: High to Low", 6],
-                    ["Rating: Low to High", 7],
-                    ["Rating: High to Low", 8],
-                  ].map(([label, value]) => (
-                    <li
-                      key={value}
-                      onClick={() => {
-                        setSorting(value);
-                        setDropdown(false);
-                      }}
-                      className="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    >
-                      {label}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+
+            {/* Dropdown menu */}
+            <div
+              id="dropdown"
+              class={`z-10  absolute ${
+                dropdown ? "" : "hidden"
+              } bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700`}
+            >
+              <ul
+                class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                aria-labelledby="dropdownDefaultButton"
+              >
+                <li
+                  onClick={() => {
+                    setSorting(1);
+                    setDropdown(false);
+                  }}
+                >
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Name : A to Z
+                  </a>
+                </li>
+                <li
+                  onClick={() => {
+                    setSorting(2);
+                    setDropdown(false);
+                  }}
+                >
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Name : Z to A
+                  </a>
+                </li>
+                <li
+                  onClick={() => {
+                    setSorting(3);
+                    setDropdown(false);
+                  }}
+                >
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Price : Low to High
+                  </a>
+                </li>
+                <li
+                  onClick={() => {
+                    setSorting(4);
+                    setDropdown(false);
+                  }}
+                >
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Price : High to Low
+                  </a>
+                </li>
+                <li
+                  onClick={() => {
+                    setSorting(5);
+                    setDropdown(false);
+                  }}
+                >
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Discount : Low to High
+                  </a>
+                </li>
+                <li
+                  onClick={() => {
+                    setSorting(6);
+                    setDropdown(false);
+                  }}
+                >
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Discount : High to Low
+                  </a>
+                </li>
+                <li
+                  onClick={() => {
+                    setSorting(7);
+                    setDropdown(false);
+                  }}
+                >
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Rating : Low to Hogh
+                  </a>
+                </li>
+                <li
+                  onClick={() => {
+                    setSorting(8);
+                    setDropdown(false);
+                  }}
+                >
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Rating : High to Low
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {isLoading ? (
-            [...Array(8)].map((_, i) => (
-              <div key={i} className="animate-pulse bg-white p-4 rounded-xl shadow">
-                <div className="h-40 bg-gray-200 rounded mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-4 bg-gray-300 rounded mb-2 w-1/2"></div>
+        {/* Product Card Section */}
+        <div>
+          <div className="grid grid-cols-4 gap-6">
+            {isLoading ? (
+              <div class="animate-pulse">
+                <div class="h-4 bg-gray-200 mt-3 mb-6 rounded"></div>
+                <div class="h-4 bg-gray-300 mb-6 rounded"></div>
+                <div class="h-4 bg-gray-200 mb-6 rounded"></div>
+                <div class="h-4 bg-gray-300 mb-6 rounded"></div>
+                <div class="h-4 bg-gray-200 mb-6 rounded"></div>
               </div>
-            ))
-          ) : (
-            productItem.map((item, i) => <ProductItem key={i} pdata={item} />)
-          )}
+            ) : (
+              productItem.map((item, i) => <ProductItem key={i} pdata={item} />)
+            )}
+          </div>
         </div>
-
-        {/* Pagination */}
         <div className="flex justify-center mt-6">
-          <ResponsivePagination
-            current={currentPage}
-            total={totalPage}
-            onPageChange={setCurrentPage}
-          />
+        <ResponsivePagination
+          current={currentPage}
+          total={totalPage}
+          onPageChange={setCurrentPage}
+        />
         </div>
-      </main>
+      </div>
     </div>
   );
 }
-
 function ProductItem({ pdata }) {
-  const { image, price, brand_name, rating, name } = pdata;
-
+  let { id, title, image, price, brand_name, rating, name } = pdata;
   return (
-    <div className="w-full bg-white rounded-2xl shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 p-4">
+    <div className="max-w-[250px] bg-white rounded-2xl shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 p-4">
       <img
         src={image}
-        alt={name}
+        alt="Essence Mascara"
         className="w-full h-[180px] object-contain mb-4"
       />
       <h2 className="text-lg font-semibold text-gray-800 mb-1">{name}</h2>
-      <p className="text-red-700 font-bold text-md mb-1">Rs. {price}</p>
+      <p className="text-red-700 font-bold text-md mb-1">Rs.{price}</p>
       <p className="text-sm text-gray-500 mb-3">Brand: {brand_name}</p>
 
       <div className="flex justify-between items-center">
-        <div className="text-yellow-500 text-lg">★★★★☆ {rating}</div>
+        <div className="text-yellow-500 text-lg">★★★★☆{rating}</div>
         <button
           type="button"
-          className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
+          className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
         >
           Add
         </button>
