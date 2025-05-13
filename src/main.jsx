@@ -9,9 +9,11 @@ import Register from './Navbar/Register.jsx'
 import Products from './Navbar/Products.jsx'
 import Login from './Navbar/Login.jsx'
 import Error from './Error.jsx'
+import MainContaxt from './MainContaxt.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    <MainContaxt>
     <BrowserRouter>
     <Routes>
       <Route path='/' element={<MainLayout/>}>
@@ -24,5 +26,6 @@ createRoot(document.getElementById('root')).render(
       </Route>
     </Routes>
     </BrowserRouter>
+    </MainContaxt>
   </StrictMode>,
 )

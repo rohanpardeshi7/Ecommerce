@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import ResponsivePagination from "react-responsive-pagination";
 import "react-responsive-pagination/themes/classic.css";
+import { ToastContainer, toast } from 'react-toastify';
+import { counterContext } from "../MainContaxt";
+
 
 export default function Products() {
   let [productItem, setProductItem] = useState([]);
@@ -211,6 +214,7 @@ export default function Products() {
         </div>
 
         {/* Product Grid */}
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {isLoading ? (
             <div className="animate-pulse">
@@ -234,13 +238,48 @@ export default function Products() {
           />
         </div>
       </div>
+      <ToastContainer
+  position="top-center" // Centered at the top
+  autoClose={2000}
+  hideProgressBar={false}
+  newestOnTop={false}
+  closeOnClick
+  rtl={false}
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  theme="colored"
+/>
+      {/* Toast Container */}
     </div>
   );
 }
 
 // Product Card
 function ProductItem({ pdata }) {
-  let { image, price, brand_name, rating, name } = pdata;
+  let { id, image, price, brand_name, rating, name } = pdata;
+ let {cart,setCart} = useContext(counterContext);
+
+ let addToCart = ()=>{
+  let cartObj ={
+    name,
+    id,
+    image,
+    price,
+    qty: 1,
+  }
+  setCart([...cart,cartObj]);
+  toast.success("Product Added to Cart");
+ }
+ let removeCart = ()=>{
+  if(confirm("Are you sure you want to remove this product from cart?")){
+    let finalData = cart.filter((items)=> items.id !== id)
+    setCart(finalData);
+    toast.error("Product Removed from Cart");
+    }}
+
+ let checkMyProductInCart = cart.filter((items)=> items.id == id);
+//  console.log(checkMyProductInCart,id);
 
   return (
     <div className="max-w-[250px] bg-white rounded-2xl shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 p-4">
@@ -255,9 +294,16 @@ function ProductItem({ pdata }) {
 
       <div className="flex justify-between items-center">
         <div className="text-yellow-500 text-lg">★ {rating}</div>
-        <button className="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-4 py-2">
-          Add
+        {checkMyProductInCart.length === 1
+        ?
+        <button onClick={removeCart} className="text-white cursor-pointer bg-red-600 font-medium rounded-lg text-sm px-4 py-2">
+         Remove from Cart
         </button>
+        :
+        <button onClick={addToCart} className="text-white cursor-pointer bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-4 py-2">
+         Add to Cart
+        </button>
+        }
       </div>
     </div>
   );

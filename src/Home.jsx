@@ -1,13 +1,15 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 import ResponsivePagination from "react-responsive-pagination";
 import "react-responsive-pagination/themes/classic.css";
+import { counterContext } from "./MainContaxt";
 
 export default function Home() {
   let [product, setProduct] = useState([]);
   let [totalPage, setTotalPage] = useState(0);
   let [currentPage, setCurrentPage] = useState(1);
+let {count,setCount}=useContext(counterContext);
 
   let getProduct = () => {
     axios
@@ -30,6 +32,12 @@ export default function Home() {
 
   return (
     <>
+      <button
+        onClick={() => setCount(count + 1)}
+        className="fixed bottom-4 right-4 bg-blue-500 text-white p-2 rounded-full shadow-lg"
+      >
+        Change
+      </button>
       {/* Hero Section */}
       <div className="max-w-[1220px] m-auto grid md:grid-cols-2 gap-8 py-10 mt-10 px-4">
         <div className="flex flex-col justify-center">
@@ -91,7 +99,9 @@ export default function Home() {
 
       {/* Product Grid */}
       <div className="max-w-[1220px] mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-6 text-gray-700">Latest Products</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-700">
+          Latest Products
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {product.map((item, index) => (
             <Product key={index} pdata={item} />
@@ -126,7 +136,7 @@ function Product({ pdata }) {
       <div className="flex justify-between items-center text-sm">
         <span className="text-yellow-500 font-medium">★ {rating}</span>
         <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs">
-          Add
+          Add to cart
         </button>
       </div>
     </div>
