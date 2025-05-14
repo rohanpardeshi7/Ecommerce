@@ -4,6 +4,8 @@ import { FaArrowRight } from "react-icons/fa";
 import ResponsivePagination from "react-responsive-pagination";
 import "react-responsive-pagination/themes/classic.css";
 import { counterContext } from "./MainContaxt";
+import { ToastContainer, toast } from 'react-toastify';
+
 
 export default function Home() {
   let [product, setProduct] = useState([]);
@@ -32,13 +34,8 @@ let {count,setCount}=useContext(counterContext);
 
   return (
     <>
-      <button
-        onClick={() => setCount(count + 1)}
-        className="fixed bottom-4 right-4 bg-blue-500 text-white p-2 rounded-full shadow-lg"
-      >
-        Change
-      </button>
-      {/* Hero Section */}
+      
+              {/* Hero Section */}
       <div className="max-w-[1220px] m-auto grid md:grid-cols-2 gap-8 py-10 mt-10 px-4">
         <div className="flex flex-col justify-center">
           <h1 className="font-extrabold text-4xl md:text-5xl lg:text-6xl leading-tight">
@@ -117,12 +114,46 @@ let {count,setCount}=useContext(counterContext);
           />
         </div>
       </div>
+      <ToastContainer
+  position="top-center" // Centered at the top
+  autoClose={2000}
+  hideProgressBar={false}
+  newestOnTop={false}
+  closeOnClick
+  rtl={false}
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  theme="colored"
+/>
     </>
   );
 }
 
 function Product({ pdata }) {
-  let { image, price, brand, rating, name } = pdata;
+  let { id, image, price, brand, rating, name } = pdata;
+  let { cart, setCart } = useContext(counterContext);
+  let addToCart = () => {
+          let obj={
+              id,
+              image,
+              price,
+              name,
+            
+            
+              qty: 1,
+            };
+            setCart([...cart, obj]);
+             toast.success("Product Added to Cart");
+  }
+  let removeCart = ()=>{
+    if(confirm("Are you sure you want to remove this product from cart?")){
+      let finalData = cart.filter((items)=> items.id !== id)
+      setCart(finalData);
+      toast.error("Product Removed from Cart");
+      }}
+   let checkMyProductInCart = cart.filter((items)=> items.id == id);
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-4 transition-transform transform hover:-translate-y-1 hover:shadow-2xl">
       <img
@@ -135,9 +166,16 @@ function Product({ pdata }) {
       <p className="text-sm text-gray-500 mb-2">Brand: {brand}</p>
       <div className="flex justify-between items-center text-sm">
         <span className="text-yellow-500 font-medium">★ {rating}</span>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs">
-          Add to cart
+       {checkMyProductInCart.length === 1
+        ?
+        <button onClick={removeCart} className="text-white cursor-pointer bg-red-600 font-medium rounded-lg text-sm px-4 py-2">
+         Remove from Cart
         </button>
+        :
+        <button onClick={addToCart} className="text-white cursor-pointer bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-4 py-2">
+         Add to Cart
+        </button>
+        }
       </div>
     </div>
   );
