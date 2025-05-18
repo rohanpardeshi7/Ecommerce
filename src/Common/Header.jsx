@@ -55,7 +55,6 @@ export default function Header() {
         {[ 
           { name: "Home", to: "/" },
           { name: `Cart (${cart.length})`, to: "/cart" },
-          { name: "Register", to: "/register" },
           { name: "Products", to: "/products" },
           { name: "Login", to: "/login" },
         ].map((link, idx) => (

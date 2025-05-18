@@ -10,6 +10,7 @@ import Products from './Navbar/Products.jsx'
 import Login from './Navbar/Login.jsx'
 import Error from './Error.jsx'
 import MainContaxt from './MainContaxt.jsx'
+import ProductDetails from './ProductDetails.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')).render(
       <Route path='/cart' element={<Cart/>}/>
       <Route path='/register' element={<Register/>}/>
       <Route path='/products' element={<Products/>}/> 
+      <Route path='/products/:id' element={<ProductDetails/>}/>
       <Route path='/login' element={<Login/>}/>
       <Route path='*' element={<Error/>}/>  
       </Route>
