@@ -1,18 +1,18 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { counterContext } from "../MainContaxt";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Header() {
-
-
-  let {cart} = useContext(counterContext);
+  let { user, setUser, token, setToken, cart } = useContext(counterContext);
   const [isOpen, setIsOpen] = useState(false);
- 
+  const navigate = useNavigate();
 
 
   return (
     <div className="sticky top-0 z-50">
-      <nav className="bg-white bg-opacity-75 shadow-lg border-gray-200 dark:bg-gray-800 dark:border-gray-700 ">
+      <nav className="bg-white bg-opacity-75 shadow-lg border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto py-3 px-4">
           <Link to="/" className="flex items-center space-x-4">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-gray-100 tracking-tight underline">
@@ -52,21 +52,53 @@ export default function Header() {
             id="navbar-default"
           >
             <ul className="font-medium flex flex-col gap-1 p-2 mt-2 border rounded-lg bg-gray-50 md:flex-row md:items-center md:space-x-4 md:mt-0 md:border-0 md:bg-transparent dark:bg-gray-800 md:dark:bg-transparent dark:border-gray-700">
-              {[
-                { name: "Home", to: "/" },
-                { name: `Cart (${cart.length})`, to: "/cart" },
-                { name: "Products", to: "/products" },
-                { name: "Login", to: "/login" },
-              ].map((link, idx) => (
-                <li key={idx}>
+              <li>
+                <Link
+                  to="/"
+                  className="block px-3 py-1 rounded-md text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/cart"
+                  className="block px-3 py-1 rounded-md text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                >
+                  Cart ({cart.length})
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/products"
+                  className="block px-3 py-1 rounded-md text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                >
+                  Products
+                </Link>
+              </li>
+              {user ? (
+                <li>
+                  <button
+                    onClick={() => {
+                      setUser(null);
+                      setToken('');
+                      navigate('/login');
+                    }}
+                    className="block w-full text-left px-3 py-1 rounded-md text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  >
+                    Logout
+                  </button>
+                </li>
+              ) : (
+                <li>
                   <Link
-                    to={link.to}
+                    to="/login"
                     className="block px-3 py-1 rounded-md text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                   >
-                    {link.name}
+                    Login
                   </Link>
                 </li>
-              ))}
+              )}
             </ul>
           </div>
         </div>
